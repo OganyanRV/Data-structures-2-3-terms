@@ -5,7 +5,8 @@
 
 
 int main() {
-  TMatrix<int> a(5), b(5), c(5);
+  TMatrix<int> a(5);
+  TMatrix<int> b(5), c(5);
   int i, j;
   std::cout << "Triangular Matrix test" << std::endl;
   for (i = 0; i < 5; i++) {
