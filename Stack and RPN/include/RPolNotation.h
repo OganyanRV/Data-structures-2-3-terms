@@ -1,7 +1,6 @@
 //  Copyright by Oganyan Robert
 
-#include <../include/token.h>
-#include <../include/Tstack.h>
+#include "../include/Token.h"
 
 class RPolNotation {
    private:
@@ -10,7 +9,7 @@ class RPolNotation {
    public:
      RPolNotation() = delete;
      explicit RPolNotation(char *form = nullptr);  // конструктор
-     explicit RPolNotation(const RPolNotation& rpn);  //  Конструктор копирования
+     RPolNotation(const RPolNotation& rpn);  //  Конструктор копирования
      ~RPolNotation();  //  Деструктор
      Token* Postfix(); // преобразование в постфиксную форму
      Token Next(int& ind); //  Вспомогательный метод для определения характеристик ячейки массива

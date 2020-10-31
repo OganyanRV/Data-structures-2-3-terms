@@ -1,6 +1,7 @@
 // Copyright 2020 Oganyan Robert
 
 #include "../include/Token.h"
+
 #ifndef STACK_INCLUDE_TOKENIZER_H_
 #define STACK_INCLUDE_TOKENIZER_H_
 class Tokenizer

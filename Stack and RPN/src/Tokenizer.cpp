@@ -1,5 +1,5 @@
 #include "../include/Tokenizer.h"
-#include "Tstack.h"
+#include "../include/Tstack.h"
 #include "cstring"
 #include <stdlib.h>
 
