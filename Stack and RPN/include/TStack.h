@@ -1,8 +1,13 @@
+//  Copyright by Oganyan Robert
+
+#ifndef STACK_AND_RPN_INCLUDE_TSTACK_H_
+#define STACK_AND_RPN_INCLUDE_TSTACK_H_
+
+#include <string.h>
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <string.h>
 #include <stdexcept>
 
 template <class T>
@@ -14,8 +19,8 @@ class TStack {
 
  public:
   TStack() = delete;
-  TStack(int _size = 0);  //  конструктор
-  TStack(const TStack<T>& s);  //  конструктор копирования
+  explicit TStack(int _size = 20);  //  конструктор
+  explicit TStack(const TStack<T>& s);  //  конструктор копирования
   ~TStack();  //  деструктор
 
   void Push(const T& val);  // Положить элемент
@@ -37,7 +42,6 @@ class TStack {
     return ostr;
   }
 };
-
 
 template<class T>
 TStack<T>::TStack(int _size) {
@@ -119,7 +123,8 @@ int TStack<T>::GetSize() {
 }
 
 template<class T>
-int TStack<T>::GetTop()
-{
+int TStack<T>::GetTop() {
   return top;
 }
+
+#endif  //  STACK_AND_RPN_INCLUDE_TSTACK_H_

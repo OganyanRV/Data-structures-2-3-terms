@@ -1,3 +1,5 @@
+  //  Copyright by Oganyan Robert
+
 #include <gtest.h>
 
 int main(int argc, char **argv)

@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <string>
-#include "../include/Tokenizer.h"
-#include "../src/Tokenizer.cpp"
 #include "../include/RPolNotation.h"
 
 int main() {
@@ -27,18 +25,18 @@ int main() {
   std::cout << "Enter the Formula:  "<<std::endl;
   std::string s;
   std::cin >> s;
-  int n = s.size();
+  int n = 0;
   char* str = const_cast<char*> (s.c_str());
   auto notation = RPolNotation(str);
-  Token* t = notation.Postfix();
+  Token* t = notation.Postfix(n);
   std::cout << "\n Postfix form: \n";
+  std::cout<<std::endl;
   for (int i = 0; i < n; i++) {
     if (t[i].type == Token::kNumber)
       std::cout << t[i].number << ' ';
     else
       std::cout << t[i].symbol << ' ';
   }
-  std::cout << "\n The result: " << notation.Calculate();
-
+ std::cout << "\n The result: " << notation.Calculate();
   return 0;
 }

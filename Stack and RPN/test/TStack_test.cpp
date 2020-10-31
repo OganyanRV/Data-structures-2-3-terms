@@ -1,3 +1,5 @@
+//  Copyright by Oganyan Robert
+
 #include <gtest.h>
 #include "TStack.h"
 #include <stack>
@@ -146,5 +148,15 @@ TEST(TStack, compare_with_STL_stack_2) {
   tst.push(1);
   tst.pop();
   EXPECT_NE(tst.size(), S.GetSize());
+}
+
+TEST(TStack, compare_with_STL_stack_3) {
+  TStack<int> S(10);
+  std::stack<int> tst;
+  S.Push(1);
+  tst.push(1);
+  tst.push(3);
+  S.Push(3);
+  EXPECT_EQ(tst.top(), S.Top());
 }
 

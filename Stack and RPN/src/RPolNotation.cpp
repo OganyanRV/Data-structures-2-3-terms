@@ -1,7 +1,11 @@
 //  Copyright by Oganyan Robert
 
+#include <stdlib.h>
+#include <cstring>
+#include <string>
+#include <cmath>
+
 #include "../include/RPolNotation.h"
-#include "../include/Tstack.h"
 
 RPolNotation::RPolNotation(char *form) {
   formula = form;
@@ -26,51 +30,52 @@ RPolNotation::RPolNotation(const RPolNotation& rpn) {
   }
 }
 
-Token * RPolNotation::Postfix() {
-    int formulaidx = 0;
-    Token *ans = new Token[size];
-    TStack <Token> st(size);
-    Token cur = Next(formulaidx);
-    int curidx = 0;
-    while (cur.type != Token::kEnd) {
-        if (cur.type == Token::kNumber) {
-            ans[curidx] = cur;
-            curidx++;
-            cur = Next(formulaidx);
-            continue;
-        }
-        if (st.IsEmpty() || cur.symbol == '(') {
-            st.Push(cur);
-            cur = Next(formulaidx);
-            continue;
-        }
-        if (cur.symbol == ')') {
-            while (st.Top().symbol != '(') {
-                ans[curidx] = st.Pop();
-                curidx++;
-            }
-            st.Pop();
-            cur = Next(formulaidx);
-            continue;
-        }
-        if (cur.prior > st.Top().prior) {
-            st.Push(cur);
-            cur = Next(formulaidx);
-            continue;
-        }
-        while (!st.IsEmpty() && st.Top().symbol != '(' && st.Top().prior >= cur.prior) {
-            ans[curidx] = st.Pop();
-            curidx++;
-        }
-        st.Push(cur);
-        cur = Next(formulaidx);
+Token * RPolNotation::Postfix(int& curidx) {
+  curidx = 0;
+  int formulaidx = 0;
+  Token *ans = new Token[size];
+  TStack<Token> st(size);
+  Token cur = Next(formulaidx);
+  while (cur.type != Token::kEnd) {
+    if (cur.type == Token::kNumber) {
+      ans[curidx] = cur;
+      curidx++;
+      cur = Next(formulaidx);
+      continue;
     }
-
-    while (!st.IsEmpty()) {
+    if (st.IsEmpty() || cur.symbol == '(') {
+      st.Push(cur);
+      cur = Next(formulaidx);
+      continue;
+    }
+    if (cur.symbol == ')') {
+      while (st.Top().symbol != '(') {
         ans[curidx] = st.Pop();
         curidx++;
+      }
+      st.Pop();
+      cur = Next(formulaidx);
+      continue;
     }
-    return ans;
+    if (cur.prior > st.Top().prior) {
+      st.Push(cur);
+      cur = Next(formulaidx);
+      continue;
+    }
+    while (!st.IsEmpty() && st.Top().symbol
+                != '(' && st.Top().prior >= cur.prior) {
+      ans[curidx] = st.Pop();
+      curidx++;
+    }
+    st.Push(cur);
+    cur = Next(formulaidx);
+  }
+
+  while (!st.IsEmpty()) {
+    ans[curidx] = st.Pop();
+    curidx++;
+  }
+  return ans;
 }
 
 Token RPolNotation::Next(int& ind) {
@@ -89,7 +94,8 @@ Token RPolNotation::Next(int& ind) {
   // алгоритм чтоб узнать какое число и вернуть его
   double num;
   int begin = ind;
-  while ((formula[ind] >= '0' && formula[ind] <= '9') || (formula[ind] == '.')) {
+  while ((formula[ind] >= '0' && formula[ind] <= '9')
+                    || (formula[ind] == '.')) {
     ind++;
   }
   char *number = new char[ind - begin + 1];
@@ -102,49 +108,91 @@ Token RPolNotation::Next(int& ind) {
 }
 
 double RPolNotation::Calculate() {
-    auto str = Postfix();
-    TStack<double> st(size);
-    int i = 0;
-    while (i < size) {
-        Token cur = str[i++];
-        if (cur.type == Token::kNumber) {
-            st.Push(cur.number);
-            continue;
-        }
-        if (st.GetTop() < 2) {
-            throw std::runtime_error("Wrong Postfix Formula");
-        }
-        auto op_fi = st.Pop();
-        auto op_se = st.Pop();
-        double res = 0.0;
-        switch (cur.symbol) {
-            case '-':
-                res = op_fi - op_se;
-                break;
-
-            case '+':
-                res = op_fi + op_se;
-                break;
-
-            case '*':
-                res = op_fi * op_se;
-                break;
-
-            case '/':
-                res = op_fi / op_se;
-                break;
-
-            default:
-                throw std::runtime_error("Wrong Postfix Formula");
-
-        }
-
-        st.Push(res);
+  int n = 0;
+  auto str = Postfix(n);
+  TStack<double> st(n);
+  int i = 0;
+  while (i < n) {
+    Token cur = str[i++];
+    if (cur.type == Token::kNumber) {
+      st.Push(cur.number);
+      continue;
     }
-    if (st.GetTop() != 1) {
+    if (st.GetTop() < 2) {
+      if (st.GetTop() == 1) {
+        if (cur.symbol == '-') {
+          int new_val = st.Pop();
+          st.Push(-1*new_val);
+          continue;
+        }
+      }
+      throw std::runtime_error("Wrong Postfix Formula");
+    }
+    auto op_fi = st.Pop();
+    auto op_se = st.Pop();
+    double res = 0.0;
+    bool fl = true;
+    switch (cur.symbol) {
+      case '-':
+        if (str[i].type == Token::kSymbol && str[i].symbol == '-') {
+          op_fi = op_fi * -1;
+          fl = false;
+          st.Push(op_se);
+          st.Push(op_fi);
+        } else {
+          res = op_se - op_fi;
+        }
+        break;
+
+      case '+':
+        res = op_fi + op_se;
+        break;
+
+      case '*':
+        res = op_fi * op_se;
+        break;
+
+      case '/':
+        res = op_se / op_fi;
+        break;
+
+      default:
         throw std::runtime_error("Wrong Postfix Formula");
     }
-    delete[] str;
-    return st.Pop();
+
+    if (fl) {
+      st.Push(res);
+    }
+  }
+  if (st.GetTop() != 1) {
+    throw std::runtime_error("Wrong Postfix Formula");
+  }
+  delete[] str;
+  return st.Pop();
 }
 
+//  Не работает
+std::string RPolNotation::Convert(const Token* str, const int& size) {
+  std::string new_str;
+  std::size_t i = 0;
+  while (i < size) {
+    if (str[i].type == Token::kSymbol) {
+      new_str += str[i].symbol;
+      new_str += ' ';
+      ++i;
+      continue;
+    }
+    auto num = str[i].number;
+    if (num == std::floor(num)) {
+      int new_num = num;
+      new_str += std::to_string(num);
+      new_str += ' ';
+      ++i;
+      continue;
+    }
+    new_str += std::to_string(num);
+    new_str += ' ';
+    ++i;
+  }
+  return new_str;
+}
