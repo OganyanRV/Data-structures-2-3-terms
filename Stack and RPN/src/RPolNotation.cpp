@@ -29,14 +29,16 @@ RPolNotation::RPolNotation(const RPolNotation& rpn) {
     }
   }
 }
-
+//  Перевод в постфиксную форму
 Token * RPolNotation::Postfix(int& curidx) {
   curidx = 0;
   int formulaidx = 0;
   Token *ans = new Token[size];
   TStack<Token> st(size);
+  //  Берем элемент
   Token cur = Next(formulaidx);
   while (cur.type != Token::kEnd) {
+    //  Если это число, то
     if (cur.type == Token::kNumber) {
       ans[curidx] = cur;
       curidx++;
@@ -49,6 +51,7 @@ Token * RPolNotation::Postfix(int& curidx) {
       continue;
     }
     if (cur.symbol == ')') {
+      //  Выплевываем до скобки
       while (st.Top().symbol != '(') {
         ans[curidx] = st.Pop();
         curidx++;
@@ -57,11 +60,14 @@ Token * RPolNotation::Postfix(int& curidx) {
       cur = Next(formulaidx);
       continue;
     }
+    //  Если текующий приоритет выше, то кладем
     if (cur.prior > st.Top().prior) {
       st.Push(cur);
       cur = Next(formulaidx);
       continue;
     }
+
+    //  Иначе выплевываем до конца, внутренней скобки или до меньшего приоритета
     while (!st.IsEmpty() && st.Top().symbol
                 != '(' && st.Top().prior >= cur.prior) {
       ans[curidx] = st.Pop();
@@ -70,7 +76,7 @@ Token * RPolNotation::Postfix(int& curidx) {
     st.Push(cur);
     cur = Next(formulaidx);
   }
-
+  // Остаток
   while (!st.IsEmpty()) {
     ans[curidx] = st.Pop();
     curidx++;
@@ -114,11 +120,13 @@ double RPolNotation::Calculate() {
   int i = 0;
   while (i < n) {
     Token cur = str[i++];
+    //  Число кладем в стэк
     if (cur.type == Token::kNumber) {
       st.Push(cur.number);
       continue;
     }
     if (st.GetTop() < 2) {
+      //  Случай для начала строки с минусом, например -5
       if (st.GetTop() == 1) {
         if (cur.symbol == '-') {
           int new_val = st.Pop();
@@ -134,6 +142,7 @@ double RPolNotation::Calculate() {
     bool fl = true;
     switch (cur.symbol) {
       case '-':
+        // Случай для -(- чтобы оно давало +
         if (str[i].type == Token::kSymbol && str[i].symbol == '-') {
           op_fi = op_fi * -1;
           fl = false;
@@ -171,7 +180,7 @@ double RPolNotation::Calculate() {
   return st.Pop();
 }
 
-//  Не работает
+//  Не работает из-за неправильного форматирования (1.000000)
 std::string RPolNotation::Convert(const Token* str, const int& size) {
   std::string new_str;
   std::size_t i = 0;

@@ -28,7 +28,6 @@ class TStack {
   T Top();  // Узнать значение верхнего элемента (без изъятия)
   bool IsFull();  //  Полный ли стэк
   bool IsEmpty();  //  Пустой ли стэк
-  void Setv(T* _v, int _size, int _top);  //
   int GetSize();  //  Размер стэка
   int GetTop();  //  Номер следующего за последним элементом
 
@@ -105,16 +104,6 @@ void TStack<T>::Push(const T& val) {
     throw std::runtime_error("Stack is full");
   }
   v[top++] = val;
-}
-
-template<class T>
-void TStack<T>::Setv(T* _v, int _size, int _top) {
-  if (_size < 0)
-    throw "Invalide size";
-  size = _size;
-  top = _top;
-  /* delete[] v;*/
-  v = _v;
 }
 
 template<class T>
