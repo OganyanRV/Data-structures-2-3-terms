@@ -1,5 +1,5 @@
  //  Copyright by Robert Oganyan
-
+#include <stdexcept>
 #ifndef QUEUE_TQUEUE_H
 #define QUEUE_TQUEUE_H
 
@@ -16,36 +16,32 @@
 
  public:
      TQueue() = delete;
-    explicit  TQueue(int _size = 20);
+      explicit  TQueue(int _size = 20);
      ~TQueue();
      TQueue(const TQueue<T>& t);
-
      void Push(const T val);
      bool IsFull();
-     T Get_notion_by_index(int ind);
      bool IsEmpty();
-     int GetNextIndex(int index);
      T GetFirst();
      T Get();
-     void Sort(Tasks a[]);
  };
 
  template <class T>
  TQueue<T>::TQueue(int _size) {
          memsize = _size;
          datacount = 0;
-         lastt = -1;
+         last = -1;
          first = 0;
          if ((memsize < 1) || (memsize > MaxQueueSize)) {
-             throw MemSize;
+             throw std::runtime_error("Wrong size");
          }
-         pMem = new T[MemSize];
+         pmem = new T[memsize];
  }
 
  template <class T>
  TQueue<T>::~TQueue() {
      if (pmem != nullptr) {
-     delete[] pmem;
+       delete[] pmem;
      }
  }
 
@@ -53,7 +49,7 @@
  TQueue<T>::TQueue(const TQueue<T>& t) {
      memsize = t.memsize;
      datacount = t.datacount;
-     lastt = t.last;
+     last = t.last;
      first = t.first;
      pmem = nullptr;
      if (t.pmem != nullptr) {
@@ -77,7 +73,7 @@
  void TQueue<T>::Push(const T val) {
 
      if (IsFull()) {
-        throw val;
+        throw std::runtime_error("Queue is full");;
      }
      if (last == memsize - 1) {
          last = 0;
@@ -85,83 +81,28 @@
      else {
          last++;
      }
-     pMem[last] = val;
+     pmem[last] = val;
      datacount++;
  }
 
  template <class T>
-
- int TQueue<T>::GetNextIndex(int index) {
-     return (index+1) % MemSize;
- }
- template <class T>
  T TQueue<T>::Get()
  {
      if (IsEmpty()) {
-         throw "negative";
+         throw std::runtime_error("Queue is empty");
      }
-    --datacount;
+     --datacount;
      T tmp = pmem[first];
-     first = GetNextIndex(first);
+     first = (first + 1) % memsize;
      return tmp;
-
  }
-/*
- template<class T>
-
- void TQueue<T>::Sort(Tasks a[])
-
- {
-
-     T temp;
-
-     for (int i = 0; i < datacount; i++)
-
-     {
-
-         for (int j = 0; j < datacount - i - 1; j++)
-
-         {
-
-             if ((a[Get_notion_by_index(j)].Getpriority() != 0) && (a[Get_notion_by_index(j + 1)].Getpriority() != 0) && (a[Get_notion_by_index(j)].Getpriority() > a[Get_notion_by_index(j + 1)].Getpriority()))
-
-             {
-
-                 temp = pMem[j];
-
-                 pMem[j] = pMem[j + 1];
-
-                 pMem[j + 1] = temp;
-
-             }
-
-         }
-
-     }
-
- }
- */
 
  template<class T>
-
  T TQueue<T>::GetFirst() {
-
-     if (IsEmpty()) throw "negative";
-
+     if (IsEmpty()) {
+       std::runtime_error("Queue is empty");
+     }
      return pmem[first];
-
- }
-
- template<class T>
-
- inline T TQueue<T>::Get_notion_by_index(int ind)
-
- {
-
-     if (IsEmpty() == 1) throw "negative";
-
-     return pMem[ind];
-
  }
 
 #endif //QUEUE_TQUEUE_H

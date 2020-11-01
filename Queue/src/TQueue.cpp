@@ -1,2 +1,0 @@
- //  Copyright by Robert Oganyan
-
